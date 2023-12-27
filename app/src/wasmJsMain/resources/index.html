@@ -36,6 +36,7 @@
             font-size: large;
             padding: .5em;
             margin: .5em auto;
+            user-select: none;
         }
 
         #dropbox.highlight {
@@ -106,6 +107,11 @@
             background-color: #ffcfcf;
         }
 
+        .optionArea {
+            user-select: none;
+            text-decoration: none;
+        }
+
         .optionLabel {
             display: inline-flex;
             align-items: center;
@@ -167,7 +173,7 @@
 
 <center>
 
-    <div>
+    <div class="optionArea">
         <div class="optionLabel">Size:</div>
         <div class="optionBox size" onclick="setSize(160)">160</div>
         <div class="optionBox size" onclick="setSize(256)">256</div>
@@ -175,7 +181,7 @@
         <div class="optionBox size" onclick="setSize(512)">512</div>
     </div>
 
-    <div>
+    <div class="optionArea">
         <div class="optionLabel">Quality:</div>
         <div class="optionBox quality" onclick="setQuality(75)">75</div>
         <div class="optionBox quality selected" onclick="setQuality(80)">80</div>
