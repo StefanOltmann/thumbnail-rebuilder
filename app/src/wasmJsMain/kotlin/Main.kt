@@ -26,6 +26,7 @@ import org.khronos.webgl.Uint8Array
 import org.w3c.dom.DragEvent
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLAnchorElement
+import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLImageElement
@@ -157,7 +158,7 @@ private fun markSelectedSizeOption() {
 
     for (element in sizeOptions.asList()) {
 
-        element as HTMLDivElement
+        element as HTMLButtonElement
 
         val selected = element.innerText == selectedSize.toString()
 
@@ -183,7 +184,7 @@ private fun markSelectedQualityOption() {
 
     for (element in qualityOptions.asList()) {
 
-        element as HTMLDivElement
+        element as HTMLButtonElement
 
         val selected = element.innerText == selectedQuality.toString()
 
