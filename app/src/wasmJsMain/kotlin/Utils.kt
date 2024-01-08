@@ -1,6 +1,6 @@
 /*
  * Thumbnail Rebuilder
- * Copyright (C) 2023 Stefan Oltmann
+ * Copyright (C) 2024 Stefan Oltmann
  * https://stefan-oltmann.de/thumbnail-rebuilder
  *
  * This program is free software: you can redistribute it and/or modify
