@@ -40,8 +40,8 @@ import org.w3c.files.get
 
 private const val JPEG_MIME_TYPE = "image/jpeg"
 
-private const val DEFAULT_SIZE = 320
-private const val DEFAULT_QUALITY = 80
+private const val DEFAULT_SIZE = 490
+private const val DEFAULT_QUALITY = 85
 
 private var contentsElement: Element? = null
 private var errorsElement: Element? = null
