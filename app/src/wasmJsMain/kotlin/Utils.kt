@@ -144,8 +144,7 @@ private fun Image.scale(longSidePx: Int): Image {
         /* Bicubic scaled images have artifacts on hairs, so linear is better. */
         samplingMode = SamplingMode.LINEAR,
         paint = paint,
-        /* Strict is slower. */
-        strict = false
+        strict = true
     )
 
     return surface.makeImageSnapshot()
