@@ -35,6 +35,16 @@ import org.khronos.webgl.set
 import org.w3c.files.Blob
 import org.w3c.files.BlobPropertyBag
 import kotlin.math.max
+import kotlin.math.round
+
+/**
+ * EXIF data can only be 65 kb in size.
+ * So an embedded thumbnail should not be bigger than 50 kb.
+ */
+const val MAX_EMBEDDED_THUMBNAIL_SIZE_KB = 50 * 1024
+
+const val JPEG_MEDIUM_QUALITY_PERCENT: Int = 80
+const val JPEG_LOW_QUALITY_PERCENT: Int = 75
 
 private val paint = Paint().apply {
     isAntiAlias = true
@@ -91,7 +101,15 @@ fun rebuildEmbeddedThumbnail(
 
     val scaledImage = originalImage.scale(size)
 
-    val thumbnailBytes = scaledImage.encodeToJpg(quality)
+    var thumbnailBytes = scaledImage.encodeToJpg(quality)
+
+    /* If the image is too big try to encode it with medium quality. */
+    if (thumbnailBytes.size > MAX_EMBEDDED_THUMBNAIL_SIZE_KB)
+        thumbnailBytes = scaledImage.encodeToJpg(JPEG_MEDIUM_QUALITY_PERCENT)
+
+    /* If it's still to big, try the lowest quality. */
+    if (thumbnailBytes.size > MAX_EMBEDDED_THUMBNAIL_SIZE_KB)
+        thumbnailBytes = scaledImage.encodeToJpg(JPEG_LOW_QUALITY_PERCENT)
 
     val updatedBytes = Kim.updateThumbnail(
         bytes = bytes,
@@ -101,30 +119,33 @@ fun rebuildEmbeddedThumbnail(
     return updatedBytes
 }
 
+@Suppress("MagicNumber")
 private fun Image.scale(longSidePx: Int): Image {
 
     val isLandscape = width > height
 
-    val resizeFactor =
+    val resizeFactor: Double =
         if (isLandscape)
-            longSidePx / width.toFloat()
+            longSidePx / width.toDouble()
         else
-            longSidePx / height.toFloat()
+            longSidePx / height.toDouble()
 
-    val scaledWidth: Float = max(1f, (resizeFactor * width))
-    val scaledHeight: Float = max(1f, (resizeFactor * height))
+    val scaledWidth: Int = max(1, round((resizeFactor * width) + 0.3).toInt())
+    val scaledHeight: Int = max(1, round((resizeFactor * height) + 0.3).toInt())
 
     val surface = Surface.makeRasterN32Premul(
-        scaledWidth.toInt(), scaledHeight.toInt()
+        scaledWidth, scaledHeight
     )
 
     surface.canvas.drawImageRect(
         image = this,
         src = Rect.makeWH(width.toFloat(), height.toFloat()),
-        dst = Rect.makeWH(scaledWidth, scaledHeight),
-        samplingMode = SamplingMode.MITCHELL,
+        dst = Rect.makeWH(scaledWidth.toFloat(), scaledHeight.toFloat()),
+        /* Bicubic scaled images have artifacts on hairs, so linear is better. */
+        samplingMode = SamplingMode.LINEAR,
         paint = paint,
-        strict = true
+        /* Strict is slower. */
+        strict = false
     )
 
     return surface.makeImageSnapshot()
