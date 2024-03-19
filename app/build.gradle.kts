@@ -45,7 +45,7 @@ kotlin {
     sourceSets {
 
         commonMain.dependencies {
-            api("com.ashampoo:kim:0.16.1")
+            api("com.ashampoo:kim:0.16.2")
             api("org.jetbrains.skiko:skiko:$skikoVersion")
         }
 
