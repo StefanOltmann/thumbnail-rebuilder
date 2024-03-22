@@ -109,7 +109,7 @@ fun rebuildEmbeddedThumbnail(
     if (thumbnailBytes.size > MAX_EMBEDDED_THUMBNAIL_SIZE_KB)
         thumbnailBytes = scaledImage.encodeToJpg(JPEG_MEDIUM_QUALITY_PERCENT)
 
-    /* If it's still to big, try the lowest quality. */
+    /* If it's still too big, try the lowest quality. */
     if (thumbnailBytes.size > MAX_EMBEDDED_THUMBNAIL_SIZE_KB)
         thumbnailBytes = scaledImage.encodeToJpg(JPEG_LOW_QUALITY_PERCENT)
 
