@@ -52,6 +52,8 @@ const val MAX_EMBEDDED_THUMBNAIL_SIZE_KB = 50 * 1024
 const val JPEG_MEDIUM_QUALITY_PERCENT: Int = 80
 const val JPEG_LOW_QUALITY_PERCENT: Int = 75
 
+private const val USE_HIGH_QUALITY_SCALING = true
+
 fun Uint8Array.toByteArray(): ByteArray =
     ByteArray(length) { this[it] }
 
@@ -101,7 +103,10 @@ fun rebuildEmbeddedThumbnail(
 
     val originalImage = Image.makeFromEncoded(bytesForThumbnail)
 
-    val scaledImage = originalImage.scale(size)
+    val scaledImage = if (USE_HIGH_QUALITY_SCALING)
+        originalImage.scaleHighQuality(size)
+    else
+        originalImage.scale(size)
 
     var thumbnailBytes = scaledImage.encodeToJpg(quality)
 
@@ -177,6 +182,46 @@ private fun Image.scale(longSidePx: Int): Image {
     )
 
     return surface.makeImageSnapshot()
+}
+
+/*
+ * Scales down in 50% steps to preserve quality.
+ */
+private fun Image.scaleHighQuality(longSidePx: Int): Image {
+
+    require(longSidePx > 0) { "Parameter 'longSidePx' must be positive, but was $longSidePx." }
+    require(width > 0 && height > 0) { "Illegal dimensions: $width x $height" }
+
+    val ratio = width.toFloat() / height
+
+    val resizeFactor: Double =
+        longSidePx / max(width.toDouble(), height.toDouble())
+
+    val scaledWidth: Int = max(1, round((resizeFactor * width) + 0.3).toInt())
+    val scaledHeight: Int = max(1, round((resizeFactor * height) + 0.3).toInt())
+
+    var thumbnail = this
+
+    var width = this.width
+
+    do {
+
+        width /= 2
+
+        if (width < scaledWidth)
+            width = scaledHeight
+
+        val bitmap = Bitmap()
+
+        bitmap.allocN32Pixels(width, (width / ratio).toInt())
+
+        thumbnail.scalePixels(bitmap.peekPixels()!!, SamplingMode.MITCHELL, false)
+
+        thumbnail = Image.makeFromBitmap(bitmap)
+
+    } while (thumbnail.width != scaledWidth)
+
+    return thumbnail
 }
 
 private fun Image.encodeToJpg(quality: Int): ByteArray {
