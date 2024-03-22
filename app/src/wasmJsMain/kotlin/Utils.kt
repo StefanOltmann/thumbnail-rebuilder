@@ -23,8 +23,14 @@ import com.ashampoo.kim.format.ImageFormatMagicNumbers
 import com.ashampoo.kim.format.jpeg.JpegOrientationOffsetFinder
 import com.ashampoo.kim.input.ByteArrayByteReader
 import com.ashampoo.kim.model.TiffOrientation
+import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.EncodedImageFormat
+import org.jetbrains.skia.FilterMipmap
+import org.jetbrains.skia.FilterMode
+import org.jetbrains.skia.FilterTileMode
 import org.jetbrains.skia.Image
+import org.jetbrains.skia.ImageFilter
+import org.jetbrains.skia.MipmapMode
 import org.jetbrains.skia.Paint
 import org.jetbrains.skia.Rect
 import org.jetbrains.skia.SamplingMode
@@ -45,10 +51,6 @@ const val MAX_EMBEDDED_THUMBNAIL_SIZE_KB = 50 * 1024
 
 const val JPEG_MEDIUM_QUALITY_PERCENT: Int = 80
 const val JPEG_LOW_QUALITY_PERCENT: Int = 75
-
-private val paint = Paint().apply {
-    isAntiAlias = true
-}
 
 fun Uint8Array.toByteArray(): ByteArray =
     ByteArray(length) { this[it] }
@@ -119,32 +121,59 @@ fun rebuildEmbeddedThumbnail(
     return updatedBytes
 }
 
+/*
+ * We need to specify a MipmapMode other than the default MipmapMode.NONE
+ * to have higher quality downscaling of images.
+ */
+val downscalingFilterMode = FilterMipmap(FilterMode.LINEAR, MipmapMode.LINEAR)
+
+val sharpeningFilter = ImageFilter.makeMatrixConvolution(
+    kernelW = 3,
+    kernelH = 3,
+    kernel = floatArrayOf(
+        0f, -0.05f, 0f,
+        -0.05f, 1.2f, -0.05f,
+        0f, -0.05f, 0f
+    ),
+    gain = 1F,
+    bias = 0F,
+    offsetX = 1,
+    offsetY = 1,
+    tileMode = FilterTileMode.CLAMP,
+    convolveAlpha = false,
+    input = null,
+    crop = null
+)
+
 @Suppress("MagicNumber")
 private fun Image.scale(longSidePx: Int): Image {
 
-    val isLandscape = width > height
-
     val resizeFactor: Double =
-        if (isLandscape)
-            longSidePx / width.toDouble()
-        else
-            longSidePx / height.toDouble()
+        longSidePx / max(width.toDouble(), height.toDouble())
 
     val scaledWidth: Int = max(1, round((resizeFactor * width) + 0.3).toInt())
     val scaledHeight: Int = max(1, round((resizeFactor * height) + 0.3).toInt())
 
+    val bitmap = Bitmap()
+
+    bitmap.allocN32Pixels(scaledWidth, scaledHeight)
+
+    this.scalePixels(bitmap.peekPixels()!!, downscalingFilterMode, false)
+
+    val downscaledImage = Image.makeFromBitmap(bitmap)
+
     val surface = Surface.makeRasterN32Premul(
-        scaledWidth, scaledHeight
+        scaledWidth,
+        scaledHeight
     )
 
-    surface.canvas.drawImageRect(
-        image = this,
-        src = Rect.makeWH(width.toFloat(), height.toFloat()),
-        dst = Rect.makeWH(scaledWidth.toFloat(), scaledHeight.toFloat()),
-        /* Bicubic scaled images have artifacts on hairs, so linear is better. */
-        samplingMode = SamplingMode.LINEAR,
-        paint = paint,
-        strict = true
+    surface.canvas.drawImage(
+        image = downscaledImage,
+        left = 0f,
+        top = 0f,
+        paint = Paint().apply {
+            imageFilter = sharpeningFilter
+        }
     )
 
     return surface.makeImageSnapshot()
