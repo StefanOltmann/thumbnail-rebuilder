@@ -52,7 +52,7 @@ const val MAX_EMBEDDED_THUMBNAIL_SIZE_KB = 50 * 1024
 const val JPEG_MEDIUM_QUALITY_PERCENT: Int = 80
 const val JPEG_LOW_QUALITY_PERCENT: Int = 75
 
-private const val USE_HIGH_QUALITY_SCALING = true
+private const val USE_HIGH_QUALITY_SCALING = false
 
 fun Uint8Array.toByteArray(): ByteArray =
     ByteArray(length) { this[it] }
