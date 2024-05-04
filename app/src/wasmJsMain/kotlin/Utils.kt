@@ -18,10 +18,9 @@
  */
 
 import com.ashampoo.kim.Kim
-import com.ashampoo.kim.common.startsWith
-import com.ashampoo.kim.format.ImageFormatMagicNumbers
 import com.ashampoo.kim.format.jpeg.JpegOrientationOffsetFinder
 import com.ashampoo.kim.input.ByteArrayByteReader
+import com.ashampoo.kim.model.ImageFormat
 import com.ashampoo.kim.model.TiffOrientation
 import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.EncodedImageFormat
@@ -237,7 +236,7 @@ private fun Image.encodeToJpg(quality: Int): ByteArray {
 private fun resetOrientationFlag(bytes: ByteArray) {
 
     /* Only do this for JPG. */
-    if (!bytes.startsWith(ImageFormatMagicNumbers.jpeg))
+    if (ImageFormat.detect(bytes) != ImageFormat.JPEG)
         return
 
     JpegOrientationOffsetFinder.findOrientationOffset(
