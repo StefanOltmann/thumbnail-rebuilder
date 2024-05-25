@@ -1,11 +1,16 @@
 [versions]
 junit = "4.13.2"
-kotlin = "1.9.24"
+kotlin = "2.0.0"
+skiko = "0.7.89.1"
+ashampoo-kim = "0.18.3"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
+skiko = { group = "org.jetbrains.skiko", name = "skiko", version.ref = "skiko" }
+skiko-wasmJsRuntime = { group = "org.jetbrains.skiko", name = "skiko-js-wasm-runtime", version.ref = "skiko" }
+ashampoo-kim = { group = "com.ashampoo", name = "kim", version.ref = "ashampoo-kim" }
 
 [plugins]
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }

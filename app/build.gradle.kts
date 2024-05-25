@@ -4,8 +4,6 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
 }
 
-val skikoVersion = "0.7.89.1"
-
 val resourcesDir = "$buildDir/resources"
 val skikoWasm by configurations.creating
 
@@ -16,7 +14,7 @@ val unzipTask = tasks.register("unzipWasm", Copy::class) {
 }
 
 dependencies {
-    skikoWasm("org.jetbrains.skiko:skiko-js-wasm-runtime:$skikoVersion")
+    skikoWasm(libs.skiko.wasmJsRuntime)
 }
 
 kotlin {
@@ -45,8 +43,8 @@ kotlin {
     sourceSets {
 
         commonMain.dependencies {
-            api("com.ashampoo:kim:0.18.2")
-            api("org.jetbrains.skiko:skiko:$skikoVersion")
+            implementation(libs.ashampoo.kim)
+            implementation(libs.skiko)
         }
 
         val wasmJsMain by getting {
