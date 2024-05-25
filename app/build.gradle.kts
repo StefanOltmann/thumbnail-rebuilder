@@ -35,9 +35,6 @@ kotlin {
         }
 
         binaries.executable()
-
-        /* Use Binaryen optimization to make it smaller & faster */
-        applyBinaryen()
     }
 
     sourceSets {
