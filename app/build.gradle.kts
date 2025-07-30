@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
-
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
 }
@@ -23,10 +21,9 @@ kotlin {
         dependsOn(unzipTask)
     }
 
-    @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
 
-        moduleName = "app"
+        outputModuleName = "app"
 
         browser {
             commonWebpackConfig {
@@ -51,7 +48,10 @@ kotlin {
         }
 
         wasmJsMain.dependencies {
+
             implementation(npm("pako", "2.1.0"))
+
+            implementation("org.jetbrains.kotlinx:kotlinx-browser:0.3")
         }
     }
 }
