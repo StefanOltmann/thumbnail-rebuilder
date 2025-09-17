@@ -1,7 +1,9 @@
 # Thumbnail Rebuilder
 
-[![Kotlin](https://img.shields.io/badge/kotlin-2.2.0-blue.svg?logo=kotlin)](httpw://kotlinlang.org)
+![Kotlin](https://img.shields.io/badge/kotlin-2.2.0-blue.svg?logo=kotlin)
+[![License: AGPL v3](https://img.shields.io/badge/license-AGPL--3.0-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 ![WASM](https://img.shields.io/badge/-WASM-gray.svg?style=flat)
+[![GitHub Sponsors](https://img.shields.io/badge/Sponsor-gray?&logo=GitHub-Sponsors&logoColor=EA4AAA)](https://github.com/sponsors/StefanOltmann)
 
 A web-based utility designed for the reconstruction of embedded thumbnails within JPEG files.
 
